@@ -30,9 +30,9 @@ class MH_GUI:
         self.top.title("Monster Hunter Stone")
         self.name_list = []
         self.hole_list = []
+        self.rarit_list = []
         self.read_name_list('.\skill.xlsx', '.\stone.xlsx')
         self.r_list = ['0', '1', '2', '3']
-        self.rarit_list = ['3', '4', '5', '6', '7']
         self.init_combobox()
         self.init_lables()
         self.init_button()
@@ -87,6 +87,13 @@ class MH_GUI:
             data = sheet.cell(i, 6).value
             self.hole_list.append(data)
         self.hole_list = list(set(self.hole_list))
+        readbook = openpyxl.load_workbook(data_res1)
+        sheet = readbook['マカ錬金 幽玄 -ZH']    # 名字的方式
+        rows = sheet.max_row  # 行
+        for i in range(2, rows+1):
+            data = sheet.cell(i, 1).value
+            self.rarit_list.append(data)
+        self.rarit_list = list(set(self.rarit_list))
 
 
 mh = MH_GUI()
