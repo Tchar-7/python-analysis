@@ -31,7 +31,7 @@ class MH_GUI:
         self.name_list = []
         self.hole_list = []
         self.rarit_list = []
-        self.read_name_list('.\skill.xlsx', '.\stone.xlsx')
+        self.read_name_list('./skill.xlsx', './stone.xlsx')
         self.r_list = ['0', '1', '2', '3']
         self.init_combobox()
         self.init_lables()
