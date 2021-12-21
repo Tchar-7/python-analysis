@@ -40,7 +40,7 @@ def load_data():
     # print(y_train.shape[0])
     for i in range(Y.shape[0]):
         # print(Y[i])
-        if i % 4 == 0:
+        if i > 500:
             index.append(i)
     return X,Y,index
 
@@ -85,11 +85,8 @@ def test_LabelSpreading(*data):
     cls.fit(X,Y_train)
     predicted_labels=cls.transduction_[unlabeled_index]
     Y_train[unlabeled_index] = predicted_labels
-    print(Y)
-    print(predicted_labels)
-    print(sum)
-    print(pd.concat([X,Y]))
-    Y.to_excel("./new2.xlsx")
+
+    pd.DataFrame(Y_train).to_excel("./new2.xlsx")
     print("Accuracy:%f"%metrics.accuracy_score(Y[unlabeled_index],predicted_labels))
 
 X,Y,unlabeled_index=load_data()
