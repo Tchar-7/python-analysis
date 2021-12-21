@@ -56,42 +56,41 @@ def test_LabelSpreading(*data):
     X,Y,unlabeled_index=data
     Y_train=np.copy(Y)
     Y_train[unlabeled_index]=-1
-    fig=plt.figure()
-    ax=fig.add_subplot(1,1,1)
-    alphas=np.linspace(0.01,0.99,num=10,endpoint=True)
-    gammas=np.logspace(-2,2,num=50)
-    colors=((1,0,0),(0,1,0),(0,0,1),(0.5,0.5,0),(0,0.5,0.5),
-        (0.5,0,0.5),(0.4,0.6,0),(0.6,0.4,0),(0,0.6,0.4),(0.5,0.3,0.2),)
-    #训练并绘图
-    for alpha,color in zip(alphas,colors):
-        scores=[]
-        for gamma in gammas:
-            clf=LabelSpreading(max_iter=100,gamma=gamma,
-                alpha=alpha,kernel='rbf')
-            clf.fit(X,Y_train)
-            predicted_labels=clf.transduction_[unlabeled_index]
-            scores.append(metrics.accuracy_score(Y[unlabeled_index],predicted_labels))
-        ax.plot(gammas,scores,label=r"$\alpha=%s$"%alpha,color=color)
+    # fig=plt.figure()
+    # ax=fig.add_subplot(1,1,1)
+    # alphas=np.linspace(0.01,0.99,num=10,endpoint=True)
+    # gammas=np.logspace(-2,2,num=50)
+    # colors=((1,0,0),(0,1,0),(0,0,1),(0.5,0.5,0),(0,0.5,0.5),
+    #     (0.5,0,0.5),(0.4,0.6,0),(0.6,0.4,0),(0,0.6,0.4),(0.5,0.3,0.2),)
+    # #训练并绘图
+    # for alpha,color in zip(alphas,colors):
+    #     scores=[]
+    #     for gamma in gammas:
+    #         clf=LabelSpreading(max_iter=100,gamma=gamma,
+    #             alpha=alpha,kernel='rbf')
+    #         clf.fit(X,Y_train)
+    #         predicted_labels=clf.transduction_[unlabeled_index]
+    #         scores.append(metrics.accuracy_score(Y[unlabeled_index],predicted_labels))
+    #     ax.plot(gammas,scores,label=r"$\alpha=%s$"%alpha,color=color)
 
-    #设置图形
-    ax.set_xlabel(r'$\gamma$')
-    ax.set_ylabel('score')
-    ax.set_xscale('log')
-    ax.legend(loc='best')
-    ax.set_title('LabelSpreading rbf kernel')
-    plt.show()
+    # #设置图形
+    # ax.set_xlabel(r'$\gamma$')
+    # ax.set_ylabel('score')
+    # ax.set_xscale('log')
+    # ax.legend(loc='best')
+    # ax.set_title('LabelSpreading rbf kernel')
+    # plt.show()
 
-    # cls=LabelSpreading(max_iter=100,kernel='rbf',gamma=0.1)
-    # cls.fit(X,Y_train)
-    # predicted_labels=cls.transduction_[unlabeled_index]
-
-    # Y_train[unlabeled_index] = predicted_labels
-    # print(Y)
-    # print(predicted_labels)
-    # print(sum)
-    # print(pd.concat([X,Y]))
-    # Y.to_excel("./new2.xlsx")
-    # print("Accuracy:%f"%metrics.accuracy_score(Y[unlabeled_index],predicted_labels))
+    cls=LabelSpreading(max_iter=100,kernel='rbf',gamma=0.76,alpha=0.7722)
+    cls.fit(X,Y_train)
+    predicted_labels=cls.transduction_[unlabeled_index]
+    Y_train[unlabeled_index] = predicted_labels
+    print(Y)
+    print(predicted_labels)
+    print(sum)
+    print(pd.concat([X,Y]))
+    Y.to_excel("./new2.xlsx")
+    print("Accuracy:%f"%metrics.accuracy_score(Y[unlabeled_index],predicted_labels))
 
 X,Y,unlabeled_index=load_data()
 #test_LabelPropagation(X,Y,unlabeled_index)
