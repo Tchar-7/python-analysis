@@ -1,8 +1,11 @@
 import tkinter as tk
-from tkinter import StringVar, ttk
+from tkinter import StringVar, ttk, messagebox
 import openpyxl
 import joblib
 import pandas as pd
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
+from sklearn.decomposition import PCA
+import numpy as np
 
 
 class stone:
@@ -21,9 +24,41 @@ class stone:
         self.hole = hole
 
     def judge(self):
-        estimator = joblib.load()
-        data_test = pd.DataFrame([[self.r, self.name1, self.lv1, self.name2, self.lv2, self.hole]], columns=['等级', '一技能', 'Lv', '二技能', 'Lv', '孔'])
-        print(estimator.predict(data_test))
+        estimator = joblib.load('knn.model')
+        skill = pd.read_excel("skill.xlsx")
+        stone_old= pd.read_excel("stone.xlsx")
+        stone_old=stone_old.iloc[:,:6]
+        print(stone_old.head())
+
+        stone = pd.DataFrame([[self.rarity, self.name1, self.lv1, self.name2, self.lv2, self.hole]], columns=['等级', '一技能', 'Lv', '二技能', 'Lv1', '孔'])
+        skillArray = skill["LookUpName"].values
+        
+        stone = pd.concat((stone_old, stone), axis=0)
+        
+        # 处理缺失值
+        stone.fillna({"二技能":"无","Lv1":0},inplace=True)
+
+        #处理技能,将技能名称用数字替换
+        skillArray = skill["LookUpName"].values
+        stone['一技能'].replace(skillArray,list(range(1,113)),inplace=True)
+        stone['二技能'].replace(skillArray,list(range(1,113)),inplace=True)
+
+        lda = LDA(n_components=1)
+        pca = PCA(n_components=1)
+        skill1=stone[['一技能','Lv']]
+        re_1=lda.fit_transform(skill1,stone['一技能'])
+        skill2=stone[['二技能','Lv1']]
+        re_2=lda.fit_transform(skill2,stone['二技能'])
+        skill = np.concatenate((re_1, re_2), axis=1)
+        re_skill = pca.fit_transform(skill)
+        stone=stone.reset_index()
+        temp= pd.DataFrame(re_skill, columns=['temp'])
+        temp=temp.reset_index()
+        df = pd.concat((stone,temp), axis=1)
+        data=df.iloc[[-1]]
+        del data['index']
+        print(data)
+        tk.messagebox.showinfo('结果', estimator.predict(data))
 
 
 class MH_GUI:
