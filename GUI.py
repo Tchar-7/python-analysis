@@ -1,6 +1,8 @@
 import tkinter as tk
 from tkinter import StringVar, ttk
 import openpyxl
+import joblib
+import pandas as pd
 
 
 class stone:
@@ -19,7 +21,9 @@ class stone:
         self.hole = hole
 
     def judge(self):
-        return 0
+        estimator = joblib.load()
+        data_test = pd.DataFrame([[self.r, self.name1, self.lv1, self.name2, self.lv2, self.hole]], columns=['等级', '一技能', 'Lv', '二技能', 'Lv', '孔'])
+        print(estimator.predict(data_test))
 
 
 class MH_GUI:
@@ -72,6 +76,20 @@ class MH_GUI:
         self.combobox4 = ttk.Combobox(self.top, textvariable=self.value4, height=len(self.r_list), width=20, values=self.r_list).place(x=200, y=130)
         self.combobox5 = ttk.Combobox(self.top, textvariable=self.value5, height=10, width=20, values=self.hole_list).place(x=200, y=170)
         self.combobox6 = ttk.Combobox(self.top, textvariable=self.value6, height=10, width=20, values=self.rarit_list).place(x=200, y=210)
+
+    def choose(self):
+        print("choose")
+        data1 = self.value1.get()
+        result = 0
+        readbook = openpyxl.load_workbook('./skill.xlsx')
+        sheet = readbook['skill']    # 名字的方式
+        rows = sheet.max_row  # 行
+        for i in range(2, rows+1):
+            data = sheet.cell(i, 1).value
+            if data == data1:
+                result = int(sheet.cell(i, 3).value)
+                self.combobox2["value"] = range(0, result)
+                break
 
     def read_name_list(self, data_res, data_res1):
         readbook = openpyxl.load_workbook(data_res)
