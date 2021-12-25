@@ -24,11 +24,11 @@ class stone:
         self.hole = hole
 
     def judge(self):
-        estimator = joblib.load('knn.model')
+        estimator = joblib.load('rbf.model')
         skill = pd.read_excel("skill.xlsx")
-        stone_old= pd.read_excel("stone.xlsx")
+        stone_old= pd.read_excel("半监督.xlsx")
         stone_old=stone_old.iloc[:,:6]
-        print(stone_old.head())
+        # print(stone_old.head())
 
         stone = pd.DataFrame([[self.rarity, self.name1, self.lv1, self.name2, self.lv2, self.hole]], columns=['等级', '一技能', 'Lv', '二技能', 'Lv1', '孔'])
         skillArray = skill["LookUpName"].values
@@ -55,6 +55,8 @@ class stone:
         temp= pd.DataFrame(re_skill, columns=['temp'])
         temp=temp.reset_index()
         df = pd.concat((stone,temp), axis=1)
+        print(df)
+        df.drop(['一技能','Lv','二技能','Lv1'],axis = 1,inplace=True)
         data=df.iloc[[-1]]
         del data['index']
         print(data)
