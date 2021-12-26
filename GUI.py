@@ -24,7 +24,7 @@ class stone:
         self.hole = hole
 
     def judge(self):
-        estimator = joblib.load('rbf.model')
+        estimator = joblib.load('cls.model')
         skill = pd.read_excel("skill.xlsx")
         stone_old= pd.read_excel("半监督.xlsx")
         stone_old=stone_old.iloc[:,:6]
@@ -114,39 +114,22 @@ class MH_GUI:
         self.combobox5 = ttk.Combobox(self.top, textvariable=self.value5, height=10, width=20, values=self.hole_list).place(x=200, y=170)
         self.combobox6 = ttk.Combobox(self.top, textvariable=self.value6, height=10, width=20, values=self.rarit_list).place(x=200, y=210)
 
-    def choose(self):
-        print("choose")
-        data1 = self.value1.get()
-        result = 0
-        readbook = openpyxl.load_workbook('./skill.xlsx')
-        sheet = readbook['skill']    # 名字的方式
-        rows = sheet.max_row  # 行
-        for i in range(2, rows+1):
-            data = sheet.cell(i, 1).value
-            if data == data1:
-                result = int(sheet.cell(i, 3).value)
-                self.combobox2["value"] = range(0, result)
-                break
-
     def read_name_list(self, data_res, data_res1):
         readbook = openpyxl.load_workbook(data_res)
-        sheet = readbook['skill']    # 名字的方式
-        rows = sheet.max_row  # 行
+        sheet = readbook['skill']
+        rows = sheet.max_row
         for i in range(2, rows+1):
             data = sheet.cell(i, 1).value
             self.name_list.append(data)
         readbook = openpyxl.load_workbook(data_res1)
-        sheet = readbook['マカ錬金 幽玄 -ZH']    # 名字的方式
-        rows = sheet.max_row  # 行
+        sheet = readbook['マカ錬金 幽玄 -ZH']
+        rows = sheet.max_row
         for i in range(2, rows+1):
-            data = sheet.cell(i, 6).value
+            data = sheet.cell(i, 6).value   # 第六列为孔位
             self.hole_list.append(data)
         self.hole_list = list(set(self.hole_list))
-        readbook = openpyxl.load_workbook(data_res1)
-        sheet = readbook['マカ錬金 幽玄 -ZH']    # 名字的方式
-        rows = sheet.max_row  # 行
         for i in range(2, rows+1):
-            data = sheet.cell(i, 1).value
+            data = sheet.cell(i, 1).value   # 第一列为稀有度
             self.rarit_list.append(data)
         self.rarit_list = list(set(self.rarit_list))
 
