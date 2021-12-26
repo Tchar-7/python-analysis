@@ -9,6 +9,7 @@ from sklearn import metrics
 from sklearn.metrics import confusion_matrix 
 from sklearn.decomposition import PCA
 import joblib
+from sklearn.preprocessing import StandardScaler
 
 def load_data():
     stone  = pd.read_excel("stone.xlsx")
@@ -20,12 +21,17 @@ def load_data():
     stone['一技能'].replace(skillArray,list(range(1,113)),inplace=True)
     stone['二技能'].replace(skillArray,list(range(1,113)),inplace=True)
 
+
+    lda = LDA(n_components=1)
     pca = PCA(n_components=1)
     skill1=stone[['一技能','Lv']]
-    re_1=pca.fit_transform(skill1)
-    skill2=stone[['二技能','Lv1']]
-    re_2=pca.fit_transform(skill2)
-    totalskill=np.concatenate((re_1,re_2),axis=1)
+    re_1=lda.fit_transform(skill1,stone['一技能'])
+    skill2=stone[['二技能','Lv.1']]
+    re_2=lda.fit_transform(skill1,stone['二技能'])
+    totlskill=np.concatenate((re_1,re_2),axis=1)
+    re_skill=pca.fit_transform(tskill)
+    df=pd.concat((stone,pd.DataFrame(re_skill,columns=['temp'])),axis = 1)
+    stone=df
     re_skill=pca.fit_transform(totalskill)
     re_skill
     stone = pd.concat((stone,pd.DataFrame(re_skill)),axis = 1)
@@ -83,7 +89,7 @@ def test_LabelSpreading(*data):
     ax.set_title('LabelSpreading rbf kernel')
     plt.show()
 
-    # cls=LabelSpreading(max_iter=100,kernel='rbf',gamma=0.76,alpha=0.7722)
+    # cls=LabelSpreading(max_iter=100,kernel='rbf',gamma=97,alpha=0.8811)
     # cls.fit(X,Y_train)
     # predicted_labels=cls.transduction_[unlabeled_index]
     # Y_train[unlabeled_index] = predicted_labels
