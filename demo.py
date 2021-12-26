@@ -8,6 +8,8 @@ from sklearn.model_selection import train_test_split
 from sklearn import metrics 
 from sklearn.metrics import confusion_matrix 
 from sklearn.decomposition import PCA
+import joblib
+
 def load_data():
     stone  = pd.read_excel("stone.xlsx")
     skill = pd.read_excel("skill.xlsx")
@@ -15,8 +17,8 @@ def load_data():
     stone.fillna({"二技能":"无","Lv1":0},inplace=True)
     #处理技能,将技能名称用数字替换
     skillArray = skill["LookUpName"].values
-    stone['一技能'].replace(skillArray,list(range(1,114)),inplace=True)
-    stone['二技能'].replace(skillArray,list(range(1,114)),inplace=True)
+    stone['一技能'].replace(skillArray,list(range(1,113)),inplace=True)
+    stone['二技能'].replace(skillArray,list(range(1,113)),inplace=True)
 
     pca = PCA(n_components=1)
     skill1=stone[['一技能','Lv']]
@@ -28,7 +30,7 @@ def load_data():
     re_skill
     stone = pd.concat((stone,pd.DataFrame(re_skill)),axis = 1)
     # stone = pd.concat((stone,pd.DataFrame(re_2)),axis = 1)
-    stone.drop(['一技能','Lv','二技能','Lv1'],axis = 1,inplace=True)
+    # stone.drop(['一技能','Lv','二技能','Lv1'],axis = 1,inplace=True)
     target = 'value'
     x_columns=[x for x in stone.columns if x not in [target]]
     X = stone[x_columns]
@@ -40,7 +42,7 @@ def load_data():
     # print(y_train.shape[0])
     for i in range(Y.shape[0]):
         # print(Y[i])
-        if i % 4 == 0:
+        if i > 500:
             index.append(i)
     return X,Y,index
 
@@ -81,17 +83,18 @@ def test_LabelSpreading(*data):
     ax.set_title('LabelSpreading rbf kernel')
     plt.show()
 
-    # cls=LabelSpreading(max_iter=100,kernel='rbf',gamma=0.1)
+    # cls=LabelSpreading(max_iter=100,kernel='rbf',gamma=0.76,alpha=0.7722)
     # cls.fit(X,Y_train)
     # predicted_labels=cls.transduction_[unlabeled_index]
-
     # Y_train[unlabeled_index] = predicted_labels
-    # print(Y)
-    # print(predicted_labels)
-    # print(sum)
-    # print(pd.concat([X,Y]))
-    # Y.to_excel("./new2.xlsx")
+
+    # pd.DataFrame(Y_train).to_excel("./new2.xlsx")
     # print("Accuracy:%f"%metrics.accuracy_score(Y[unlabeled_index],predicted_labels))
+
+    # joblib.dump(cls, 'cls.model')
+    # spread = joblib.load('cls.model')
+
+
 
 X,Y,unlabeled_index=load_data()
 #test_LabelPropagation(X,Y,unlabeled_index)

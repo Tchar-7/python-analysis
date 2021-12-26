@@ -1,6 +1,11 @@
 import tkinter as tk
-from tkinter import StringVar, ttk
+from tkinter import StringVar, ttk, messagebox
 import openpyxl
+import joblib
+import pandas as pd
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
+from sklearn.decomposition import PCA
+import numpy as np
 
 
 class stone:
@@ -19,7 +24,43 @@ class stone:
         self.hole = hole
 
     def judge(self):
-        return 0
+        estimator = joblib.load('rbf.model')
+        skill = pd.read_excel("skill.xlsx")
+        stone_old= pd.read_excel("半监督.xlsx")
+        stone_old=stone_old.iloc[:,:6]
+        # print(stone_old.head())
+
+        stone = pd.DataFrame([[self.rarity, self.name1, self.lv1, self.name2, self.lv2, self.hole]], columns=['等级', '一技能', 'Lv', '二技能', 'Lv1', '孔'])
+        skillArray = skill["LookUpName"].values
+        
+        stone = pd.concat((stone_old, stone), axis=0)
+        
+        # 处理缺失值
+        stone.fillna({"二技能":"无","Lv1":0},inplace=True)
+
+        #处理技能,将技能名称用数字替换
+        skillArray = skill["LookUpName"].values
+        stone['一技能'].replace(skillArray,list(range(1,113)),inplace=True)
+        stone['二技能'].replace(skillArray,list(range(1,113)),inplace=True)
+
+        lda = LDA(n_components=1)
+        pca = PCA(n_components=1)
+        skill1=stone[['一技能','Lv']]
+        re_1=lda.fit_transform(skill1,stone['一技能'])
+        skill2=stone[['二技能','Lv1']]
+        re_2=lda.fit_transform(skill2,stone['二技能'])
+        skill = np.concatenate((re_1, re_2), axis=1)
+        re_skill = pca.fit_transform(skill)
+        stone=stone.reset_index()
+        temp= pd.DataFrame(re_skill, columns=['temp'])
+        temp=temp.reset_index()
+        df = pd.concat((stone,temp), axis=1)
+        print(df)
+        df.drop(['一技能','Lv','二技能','Lv1'],axis = 1,inplace=True)
+        data=df.iloc[[-1]]
+        del data['index']
+        print(data)
+        tk.messagebox.showinfo('结果', estimator.predict(data))
 
 
 class MH_GUI:
@@ -72,6 +113,20 @@ class MH_GUI:
         self.combobox4 = ttk.Combobox(self.top, textvariable=self.value4, height=len(self.r_list), width=20, values=self.r_list).place(x=200, y=130)
         self.combobox5 = ttk.Combobox(self.top, textvariable=self.value5, height=10, width=20, values=self.hole_list).place(x=200, y=170)
         self.combobox6 = ttk.Combobox(self.top, textvariable=self.value6, height=10, width=20, values=self.rarit_list).place(x=200, y=210)
+
+    def choose(self):
+        print("choose")
+        data1 = self.value1.get()
+        result = 0
+        readbook = openpyxl.load_workbook('./skill.xlsx')
+        sheet = readbook['skill']    # 名字的方式
+        rows = sheet.max_row  # 行
+        for i in range(2, rows+1):
+            data = sheet.cell(i, 1).value
+            if data == data1:
+                result = int(sheet.cell(i, 3).value)
+                self.combobox2["value"] = range(0, result)
+                break
 
     def read_name_list(self, data_res, data_res1):
         readbook = openpyxl.load_workbook(data_res)
