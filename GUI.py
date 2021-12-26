@@ -6,6 +6,7 @@ import pandas as pd
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 from sklearn.decomposition import PCA
 import numpy as np
+from sklearn.preprocessing import StandardScaler
 
 
 class stone:
@@ -57,7 +58,18 @@ class stone:
         df = pd.concat((stone,temp), axis=1)
         print(df)
         df.drop(['一技能','Lv','二技能','Lv1'],axis = 1,inplace=True)
-        data=df.iloc[[-1]]
+        stone = df
+        #数据归一化
+        kong=stone['孔'].values.reshape(-1,1)
+        temp=stone['temp'].values.reshape(-1,1)
+        rank=stone['等级'].values.reshape(-1,1)
+
+        scaler = StandardScaler(copy=False)
+        stone['孔']=scaler.fit_transform(kong)
+        stone['temp']=scaler.fit_transform(temp)
+        stone['等级']=scaler.fit_transform(rank)
+
+        data=stone.iloc[[-1]]
         del data['index']
         print(data)
         tk.messagebox.showinfo('结果', estimator.predict(data))
