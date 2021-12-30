@@ -12,17 +12,17 @@ from sklearn.preprocessing import StandardScaler
 class stone:
     def __init__(self, r, name1, lv1, name2, lv2, hole):
         self.rarity = r
-        self.name1 = name1
-        if self.name1 == "无":
+        self.name1 = name1  # 技能1
+        if self.name1 == "无":  # 如果没有技能则为0级
             self.lv1 = '0'
         else:
-            self.lv1 = lv1
+            self.lv1 = lv1  # 技能等级1
         self.name2 = name2
         if self.name2 == "无":
             self.lv2 = '0'
         else:
-            self.lv2 = lv2
-        self.hole = hole
+            self.lv2 = lv2  # 技能等级2
+        self.hole = hole    # 孔位
 
     def judge(self):
         estimator = joblib.load('forest.model')
@@ -81,9 +81,9 @@ class MH_GUI:
         self.top.geometry("500x300")
         self.top.resizable(0, 0)
         self.top.title("Monster Hunter Stone")
-        self.name_list = []
-        self.hole_list = []
-        self.rarit_list = []
+        self.name_list = [] # 存储技能名称
+        self.hole_list = [] # 存储孔位的类型
+        self.rarit_list = []    # 存储稀有度类型
         self.read_name_list('./skill.xlsx', './stone.xlsx')
         self.r_list = ['0', '1', '2', '3']
         self.init_combobox()
@@ -98,7 +98,7 @@ class MH_GUI:
         TheStone = stone(self.value6.get(), self.value1.get(), self.value2.get(), self.value3.get(), self.value4.get(), self.value5.get())
         TheStone.judge()
 
-    def init_lables(self):
+    def init_lables(self):  # 初始化标签
         self.label1 = tk.Label(self.top, text="技能1:").place(x=150, y=10)
         self.label2 = tk.Label(self.top, text="Lv:").place(x=150, y=50)
         self.label3 = tk.Label(self.top, text="技能2:").place(x=150, y=90)
@@ -106,7 +106,7 @@ class MH_GUI:
         self.label5 = tk.Label(self.top, text="孔位").place(x=150, y=170)
         self.label5 = tk.Label(self.top, text="稀有度").place(x=150, y=210)
 
-    def init_combobox(self):
+    def init_combobox(self):    # 初始化下拉框
         self.value1 = StringVar()
         self.value1.set("请选择技能1")
         self.value2 = StringVar()
@@ -128,10 +128,11 @@ class MH_GUI:
 
     def read_name_list(self, data_res, data_res1):
         readbook = openpyxl.load_workbook(data_res)
-        sheet = readbook['skill']
+        # 早期并未使用pandas读取excel是因为没有交流好
+        sheet = readbook['skill']   # 读取skill表
         rows = sheet.max_row
         for i in range(2, rows+1):
-            data = sheet.cell(i, 1).value
+            data = sheet.cell(i, 1).value   # 第一列为名称
             self.name_list.append(data)
         readbook = openpyxl.load_workbook(data_res1)
         sheet = readbook['マカ錬金 幽玄 -ZH']
