@@ -25,7 +25,7 @@ class stone:
         self.hole = hole
 
     def judge(self):
-        estimator = joblib.load('cls.model')
+        estimator = joblib.load('forest.model')
         skill = pd.read_excel("skill.xlsx")
         stone_old= pd.read_excel("半监督.xlsx")
         stone_old=stone_old.iloc[:,:6]
@@ -44,33 +44,33 @@ class stone:
         stone['一技能'].replace(skillArray,list(range(1,113)),inplace=True)
         stone['二技能'].replace(skillArray,list(range(1,113)),inplace=True)
 
-        lda = LDA(n_components=1)
-        pca = PCA(n_components=1)
-        skill1=stone[['一技能','Lv']]
-        re_1=lda.fit_transform(skill1,stone['一技能'])
-        skill2=stone[['二技能','Lv1']]
-        re_2=lda.fit_transform(skill2,stone['二技能'])
-        skill = np.concatenate((re_1, re_2), axis=1)
-        re_skill = pca.fit_transform(skill)
-        stone=stone.reset_index()
-        temp= pd.DataFrame(re_skill, columns=['temp'])
-        temp=temp.reset_index()
-        df = pd.concat((stone,temp), axis=1)
-        print(df)
-        df.drop(['一技能','Lv','二技能','Lv1'],axis = 1,inplace=True)
-        stone = df
-        #数据归一化
-        kong=stone['孔'].values.reshape(-1,1)
-        temp=stone['temp'].values.reshape(-1,1)
-        rank=stone['等级'].values.reshape(-1,1)
+        # lda = LDA(n_components=1)
+        # pca = PCA(n_components=1)
+        # skill1=stone[['一技能','Lv']]
+        # re_1=lda.fit_transform(skill1,stone['一技能'])
+        # skill2=stone[['二技能','Lv1']]
+        # re_2=lda.fit_transform(skill2,stone['二技能'])
+        # skill = np.concatenate((re_1, re_2), axis=1)
+        # re_skill = pca.fit_transform(skill)
+        # stone=stone.reset_index()
+        # temp= pd.DataFrame(re_skill, columns=['temp'])
+        # temp=temp.reset_index()
+        # df = pd.concat((stone,temp), axis=1)
+        # print(df)
+        # df.drop(['一技能','Lv','二技能','Lv1'],axis = 1,inplace=True)
+        # stone = df
+        # #数据归一化
+        # kong=stone['孔'].values.reshape(-1,1)
+        # temp=stone['temp'].values.reshape(-1,1)
+        # rank=stone['等级'].values.reshape(-1,1)
 
-        scaler = StandardScaler(copy=False)
-        stone['孔']=scaler.fit_transform(kong)
-        stone['temp']=scaler.fit_transform(temp)
-        stone['等级']=scaler.fit_transform(rank)
+        # scaler = StandardScaler(copy=False)
+        # stone['孔']=scaler.fit_transform(kong)
+        # stone['temp']=scaler.fit_transform(temp)
+        # stone['等级']=scaler.fit_transform(rank)
 
         data=stone.iloc[[-1]]
-        del data['index']
+        # del data['index']
         print(data)
         tk.messagebox.showinfo('结果', estimator.predict(data))
 
